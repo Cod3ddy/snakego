@@ -42,7 +42,7 @@ func (s *SnakeSegment) ZIndex() int {
 	return s.Zindex
 }
 
-// Friuot
+// Fruit
 func (f *Food) Draw() {
 	rl.DrawRectangleV(f.Position, f.Size, f.Color)
 }
@@ -51,6 +51,7 @@ func (f *Food) ZIndex() int {
 	return f.Zindex
 }
 
+// Text
 func (t *GameText) Draw() {
 	rl.DrawText(t.Text, t.X, t.Y, t.FontSize, t.Color)
 }
