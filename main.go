@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/cod3ddy/snakego/render"
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -79,7 +80,7 @@ func InitGame() {
 	fruit.Size = rl.Vector2{X: squareSize, Y: squareSize}
 	fruit.Color = rl.SkyBlue
 	fruit.IsActive = false
-	displayScore(score)
+	// displayScore(score)
 }
 
 func UpdateGame() {
@@ -178,7 +179,7 @@ func UpdateGame() {
 				fruit.IsActive = false
 			}
 
-			displayScore(score)
+			
 			frameCounter++
 		}
 	} else {
@@ -193,7 +194,9 @@ func DrawGame() {
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.RayWhite)
 
-	if !gameOver {
+	var gameObjects []render.Drawable
+
+	if !gameOver && !isStartMenu{
 		// Drawgrid lines
 		for i := 0; i < screenWidth/squareSize+1; i++ {
 			rl.DrawLineV(
@@ -210,10 +213,16 @@ func DrawGame() {
 		// DrawSnake
 
 		for i := 0; i < counterTail; i++ {
-			rl.DrawRectangleV(snake[i].Position, snake[i].Size, snake[i].Color)
 
-			// draw fruit to pick
-			rl.DrawRectangleV(fruit.Position, fruit.Size, fruit.Color)
+			newSnake := &render.SnakeSegment{Position: snake[i].Position, Size: snake[i].Size, Color: snake[i].Color, Zindex: 1}
+			newFruit := &render.Food{Position: fruit.Position, Size: fruit.Size, Color: fruit.Color, Zindex: 1}
+
+			newGameScore := render.GameScore(score)
+		
+
+			gameObjects = append(gameObjects, newSnake)
+			gameObjects = append(gameObjects, newFruit)
+			gameObjects = append(gameObjects, newGameScore)
 
 			if pause && !isStartMenu {
 				rl.DrawText("Game Paused", screenWidth/2-rl.MeasureText("Game Paused", 40)/2, screenHeight/2-40, 40, rl.Gray)
@@ -226,6 +235,17 @@ func DrawGame() {
 	} else {
 		rl.DrawText("Press [ENTER] to Play Again!", int32(rl.GetScreenWidth())/2-rl.MeasureText("Press [ENTER] to Play Again!", 20)/2, int32(rl.GetScreenHeight())/2-50, 20, rl.Gray)
 		score = 0
+	}
+	
+
+	// Sort objects according to their ZIndex
+	sort.Slice(gameObjects, func(i, j int)bool{
+		return gameObjects[i].ZIndex() < gameObjects[j].ZIndex()
+	})
+
+	//Render objects inorder of zindex
+	for _, obj := range gameObjects{
+		obj.Draw()
 	}
 
 	rl.EndDrawing()
@@ -247,15 +267,10 @@ func main() {
 	rl.SetTargetFPS(60)
 
 	for !rl.WindowShouldClose() {
-		// rl.BeginDrawing()
 
 		if isStartMenu {
 			fmt.Println("We're on the start menu now")
 		}
-		// rl.ClearBackground(rl.RayWhite)
-		// rl.DrawText("Golang na scam: Shadow go to sleep!", 190, 200, 20, rl.Black)
-
-		// rl.EndDrawing()
 
 		UpdateDrawFrame()
 	}
@@ -267,8 +282,4 @@ func startMenu() {
 	startText := "Start Menu"
 	var fontSize int32 = 40
 	rl.DrawText("Start Menu", screenWidth/2-rl.MeasureText(startText, fontSize)/2, screenHeight/2-fontSize, fontSize, rl.Gray)
-
-	if rl.IsKeyPressed(rl.KeyEscape) {
-		isStartMenu = false
-	}
 }
