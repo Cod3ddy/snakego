@@ -8,7 +8,7 @@ type (
 		ZIndex() int
 	}
 
-	Text struct {
+	GameText struct {
 		Text     string
 		FontSize int32
 		X, Y     int32
@@ -33,6 +33,7 @@ type (
 	}
 )
 
+// Snake
 func (s *SnakeSegment) Draw() {
 	rl.DrawRectangleV(s.Position, s.Size, s.Color)
 }
@@ -41,10 +42,19 @@ func (s *SnakeSegment) ZIndex() int {
 	return s.Zindex
 }
 
-func (t *Text) Draw() {
+// Friuot
+func (f *Food) Draw() {
+	rl.DrawRectangleV(f.Position, f.Size, f.Color)
+}
+
+func (f *Food) ZIndex() int {
+	return f.Zindex
+}
+
+func (t *GameText) Draw() {
 	rl.DrawText(t.Text, t.X, t.Y, t.FontSize, t.Color)
 }
 
-func (t *Text) ZIndex() int {
+func (t *GameText) ZIndex() int {
 	return t.Zindex
 }
